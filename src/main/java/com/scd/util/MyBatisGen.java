@@ -1,8 +1,8 @@
 package com.scd.util;
 
 import com.scd.api.ShellRunner;
-import org.mybatis.generator.logging.Log;
-import org.mybatis.generator.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
  * @date 2019/11/24.
  */
 public class MyBatisGen {
-    private static final Log LOG = LogFactory.getLog(MyBatisGen.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MyBatisGen.class);
 
     private static final String JAR_PATH  = "@@@###JAR###@@@";
 
@@ -78,7 +78,7 @@ public class MyBatisGen {
         FileUtil.makedir(target);
         String filepath = target + File.separator + "mbgeneratorConfig.xml";
         FileUtil.writeStrtoFile(filepath, template, false);
-        System.out.println("create config success ");
+        LOG.info("create config success ");
         String[] command = {ShellRunner.CONFIG_FILE, filepath, ShellRunner.OVERWRITE};
         ShellRunner.genCode(command);
     }
