@@ -41,7 +41,7 @@ private static String[] tables = {
 
 ## Main Class
 
-com/scd/util/MyBatisGen.java
+com/scd/util/MyBatisProGen.java
 
 ## 使用步骤
 
@@ -77,3 +77,9 @@ models=ArticlePO|TaskParamPO|TestPO|UserPO
 # 生成 xml 配置文件路径， 模板文件固定在 resources 目录下面
 configPath=temp
 ```
+
+## step2 run main
+
+MyBatisProGen  -->  run
+
+代码文件会在 configPath 对应路径下生成
