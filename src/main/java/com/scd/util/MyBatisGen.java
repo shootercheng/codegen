@@ -32,15 +32,11 @@ public class MyBatisGen {
     private static final String driverPath = "jar/mysql-connector-java-5.1.47.jar";
 
     private static String[] tables = {
-            "t_task_param",
-            "t_test",
-            "t_article"
+            "t_user"
     };
 
     private static String[] models = {
-            "TaskParam",
-            "Test",
-            "Article"
+            "TestUser"
     };
 
 
@@ -50,7 +46,7 @@ public class MyBatisGen {
         FileUtil.mkdirs(targetPath);
         String resource = "templates/generatorConfigTemplate.xml";
         String template = "";
-        // 读取之后会关闭文件流
+        // finally close
         try(InputStream inputStream = FileUtil.getResourceInputStream(MyBatisGen.class.getClassLoader(), resource)){
             template = FileUtil.readFileAll(inputStream, StandardCharsets.UTF_8.name());
         } catch (Exception e){

@@ -1,8 +1,11 @@
 package com.scd.util;
 
+import com.scd.exception.ResourceLoadException;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
@@ -71,7 +74,7 @@ public class FileUtil {
         writer.flush();
         writer.close();
     }
-	
+    
     /**
      * 写入文件时指定编码
      * @param filepath
@@ -81,11 +84,12 @@ public class FileUtil {
      * @throws Exception
      */
     public static void writeBuffToFile(String filepath, String content, boolean append, String encode) throws Exception{
-    	BufferedWriter bufferedWriter = new BufferedWriter( new OutputStreamWriter(
-    			new FileOutputStream(filepath, append), encode));
-    	bufferedWriter.write(content);
-    	bufferedWriter.close();
-    }	
+        BufferedWriter bufferedWriter = new BufferedWriter( new OutputStreamWriter(
+                new FileOutputStream(filepath, append), encode));
+        bufferedWriter.write(content);
+        bufferedWriter.close();
+        bufferedWriter.newLine();
+    }    
 
     /**
      * byte[] 数组写入文件
@@ -175,62 +179,91 @@ public class FileUtil {
         }
     }
     
-    	/**
-	 * 删除文件
-	 * @param filepath
-	 */
-	public static void deleteFile(String filepath){
-		File file = new File(filepath);
-		if(file.exists()){
-			if(file.isDirectory()){
-				System.out.println("enter dir " + file.getPath());
-				File[] files = file.listFiles();
-				for(File f : files){
-					deleteFile(f.getAbsolutePath());
-				}
-			}else if(file.isFile()){
-				System.out.println("delete file :"+ file.getAbsolutePath());
-				file.delete();
-			}
-		}
-	}
-	
-	/**
-	 * 删除文件以及文件夹
-	 * @param filepath
-	 */
-	public static void deleteDirAndFile(String filepath){
-		File file = new File(filepath);
-		if(file.exists()){
-			if(file.isDirectory()){
-				System.out.println("enter dir " + file.getPath());
-				File[] files = file.listFiles();
-				for(File f : files){
-					deleteDirAndFile(f.getAbsolutePath());
-				}
-				if(file.delete()){
-					System.out.println("delete dir " + file.getAbsolutePath());
-				}
-			}else if(file.isFile()){
-				System.out.println("delete file :"+ file.getAbsolutePath());
-				file.delete();
-			}
-		}
-	}
+        /**
+     * 删除文件
+     * @param filepath
+     */
+    public static void deleteFile(String filepath){
+        File file = new File(filepath);
+        if(file.exists()){
+            if(file.isDirectory()){
+                System.out.println("enter dir " + file.getPath());
+                File[] files = file.listFiles();
+                for(File f : files){
+                    deleteFile(f.getAbsolutePath());
+                }
+            }else if(file.isFile()){
+                System.out.println("delete file :"+ file.getAbsolutePath());
+                file.delete();
+            }
+        }
+    }
+    
+    /**
+     * 删除文件以及文件夹
+     * @param filepath
+     */
+    public static void deleteDirAndFile(String filepath){
+        File file = new File(filepath);
+        if(file.exists()){
+            if(file.isDirectory()){
+                System.out.println("enter dir " + file.getPath());
+                File[] files = file.listFiles();
+                for(File f : files){
+                    deleteDirAndFile(f.getAbsolutePath());
+                }
+                if(file.delete()){
+                    System.out.println("delete dir " + file.getAbsolutePath());
+                }
+            }else if(file.isFile()){
+                System.out.println("delete file :"+ file.getAbsolutePath());
+                file.delete();
+            }
+        }
+    }
 
-	public static void makedir(String dir){
-	    File file = new File(dir);
-	    if (!file.exists()){
-	        file.mkdirs();
+    public static void makedir(String dir){
+        File file = new File(dir);
+        if (!file.exists()){
+            file.mkdirs();
         }
     }
 
     public static InputStream getResourceInputStream(ClassLoader classLoader, String resource) {
         InputStream returnValue = classLoader.getResourceAsStream(resource);
-        if (null == returnValue) {
+        if (returnValue == null) {
             returnValue = classLoader.getResourceAsStream("/" + resource);
+            // 外挂文件加载
+            if (returnValue == null) {
+                try {
+                    returnValue = new FileInputStream(resource);
+                } catch (FileNotFoundException e) {
+                }
+            }
+        }
+        if (returnValue == null) {
+            throw new ResourceLoadException("load resource " + resource + "fail");
         }
         return returnValue;
+    }
+
+    public static Reader getReader(String reource) {
+        InputStream inputStream = getResourceInputStream(Thread.currentThread().getContextClassLoader(), reource);
+        return new InputStreamReader(inputStream);
+    }
+
+    public static Properties getResourceAsProperties(ClassLoader classLoader, String resource) {
+        Properties properties = new Properties();
+        try (InputStream inputStream = getResourceInputStream(classLoader, resource)) {
+            properties.load(inputStream);
+        } catch (IOException e) {
+            throw new ResourceLoadException("load properties error " + resource, e);
+        }
+        return properties;
+    }
+
+    public static Properties getResourceAsProperties(String resource) {
+        return getResourceAsProperties(Thread.currentThread().getContextClassLoader(), resource);
     }
 
     /**
@@ -294,4 +327,6 @@ public class FileUtil {
             }
         }
     }
+
+
 }
