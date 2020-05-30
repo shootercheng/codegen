@@ -17,10 +17,10 @@ import java.util.Properties;
 public class MyBatisProGen {
     private static final Logger LOG = LoggerFactory.getLogger(MyBatisGen.class);
 
-    // 驱动路径，放在resources
+    /**
+     * 驱动路径，放在resources
+     */
     private static final String driverPath = "jar/mysql-connector-java-5.1.47.jar";
-
-    private static final String LINE_SEP = System.lineSeparator();
 
     /**
      * 配置文件输出路径
@@ -28,16 +28,18 @@ public class MyBatisProGen {
      */
     private static final String configPath = "temp";
 
+    /**
+     * 输出 model、xml、mapper 路径
+     */
+    private static final String codePath = "code";
+
+    private static final String LINE_SEP = System.lineSeparator();
+
     private static final String TABLES_TEMPLATE = "@@@###TABLES###@@@";
 
-    private static final String TABLE_NAME_TEMPLATE = "@@@###TABLE###@@@";
+    private static final String TABLE_NAME_TEMPLATE = "${table}";
 
-    private static final String MODEL_NAME_TEMPLATE = "@@@###MODEL###@@@";
-
-    private static final String TABLE_TEMPLATE_STR = "<table tableName=\"@@@###TABLE###@@@\" " +
-            "domainObjectName=\"@@@###MODEL###@@@\" enableCountByExample=\"false\" " +
-            "enableUpdateByExample=\"false\" enableDeleteByExample=\"false\" " +
-            "enableSelectByExample=\"false\" selectByExampleQueryId=\"false\"></table>";
+    private static final String MODEL_NAME_TEMPLATE = "${model}";
 
     public static void main(String[] args) throws Exception {
         String properPath = "templates/gen.properties";
@@ -69,6 +71,12 @@ public class MyBatisProGen {
             path = configPath;
             properties.put("configPath", path);
         }
+        String outCodePath = properties.getProperty("targetPath");
+        if (StrParseUtil.isEmpty(outCodePath)) {
+            outCodePath = codePath;
+            FileUtil.mkdirs(outCodePath);
+            properties.put("targetPath", outCodePath);
+        }
     }
 
     private static String createConfigFile(String template, Properties properties) throws Exception {
@@ -85,9 +93,8 @@ public class MyBatisProGen {
                 stringBuilder.append(readLine).append(LINE_SEP);
             }
         }
-        // 替换 Table 标签
         String ouputConfig = properties.getProperty("configPath");
-        FileUtil.makedir(ouputConfig);
+        FileUtil.mkdirs(ouputConfig);
         String filepath = ouputConfig + File.separator + "mbgeneratorConfig.xml";
         FileUtil.writeStrtoFile(filepath, stringBuilder.toString(), false);
         return filepath;
@@ -97,8 +104,9 @@ public class MyBatisProGen {
         StringBuilder tableBuilder = new StringBuilder("");
         List<String> tables = StrParseUtil.parseStrBySeparator(properties.getProperty("tables"), "|");
         List<String> models = StrParseUtil.parseStrBySeparator(properties.getProperty("models"), "|");
+        String tableTagStr = properties.getProperty("tableTagTemplate");
         for (int i = 0; i < tables.size(); i++){
-            String tablestr = TABLE_TEMPLATE_STR;
+            String tablestr = tableTagStr;
             tablestr = tablestr.replace(TABLE_NAME_TEMPLATE, tables.get(i));
             tablestr = tablestr.replace(MODEL_NAME_TEMPLATE, models.get(i));
             tableBuilder.append(tablestr).append("\n\t\t");

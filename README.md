@@ -1,4 +1,4 @@
-# codegen
+codegen
 
 ## main class
 
@@ -68,10 +68,12 @@ modelPkg=scd.model
 xmlPkg=scd.xml
 mapperPkg=scd.mapper
 
-# table and model
+# table、model、table tag
 # 需要生成数据库的表，以及对应的模型名字，注意顺序对应关系
 tables=t_article|t_task_param|t_test|t_user
 models=ArticlePO|TaskParamPO|TestPO|UserPO
+tableTagTemplate=<table tableName="${table}" domainObjectName="${model}" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+
 
 # gen config path
 # 生成 xml 配置文件路径， 模板文件固定在 resources 目录下面

@@ -42,5 +42,7 @@ public class StrParseUtilTest {
         Assert.assertEquals("t_task_param", resultList.get(1));
         Assert.assertEquals("t_test", resultList.get(2));
         Assert.assertEquals("t_user", resultList.get(3));
+        List<String> resultList2 = StrParseUtil.parseStrBySeparator(tables, "|");
+        Assert.assertEquals(1, resultList2.size());
     }
 }
