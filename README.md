@@ -84,4 +84,4 @@ configPath=temp
 
 MyBatisProGen  -->  run
 
-代码文件会在 configPath 对应路径下生成
+代码文件会在 targetPath 对应路径下生成
